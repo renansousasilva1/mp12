@@ -1,0 +1,255 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.navbar {
+    background-color: black;
+    color: white;
+    padding: 10px;
+}
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.brand {
+    text-decoration: none;
+    color: white;
+    font-size: 24px;
+}
+.toggle-menu {
+    display: none;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+.nav-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+.nav-links li {
+    margin-left: 20px;
+}
+.nav-links a {
+    text-decoration: none;
+    color: white;
+}
+
+
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    width: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    margin-left: -6px;
+}
+
+.search-bar button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.search-bar .fas {
+    font-size: 18px;
+    color: #888;
+}
+
+
+
+.ip212{
+    height:300px; transform: rotate(3deg);
+}
+
+
+.ip212{
+margin-top:30px;
+margin-left:234px;
+            
+}
+
+.txt-32{
+margin-top:90px;
+margin-left:340px;
+color:white;
+
+}
+
+.container-txt33{
+    margin-left:675px;
+    margin-top:40px;
+}
+
+.txt-33{
+margin-top:-225px;
+margin-left:-335px;
+margin-right:230px;
+color:white;
+}
+
+
+.btn232{
+    margin-top:80px;
+    margin-left:-420px;
+}
+
+.btn231{
+margin-top:80px;
+margin-left:329px;  
+
+}
+
+.container2{
+background-color:#212529;
+display:flex;
+height:400px;
+}
+
+.mt-5{
+    margin-top: 3rem !important;
+    margin-left:-28px;
+}
+
+
+
+
+/*Estilo para telas com altura menor que 730px */
+
+@media(max-height:730px){
+    .toggle-menu {
+        display: block;
+    }
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    
+}
+
+
+/* Estilo para telas com largura menor que 768px */
+@media (max-width: 768px) {
+    .toggle-menu {
+        display: block;
+    }
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    .locate-button {
+    position: absolute;
+    display:flex;
+    align-items:center;
+    margin-top: -165px; /* Ajuste a posição vertical acima do botão de zoom */
+    right: 10px; /* Margem direita */
+    z-index: 2;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    height:43px;
+    width:45px;
+    padding: 8px;
+    padding-left:9px;
+    padding-top:8.5px;
+    cursor: pointer;
+    
+}
+
+    .locate-button img {
+    width: 20px;
+    height: 20px;
+}
+
+    .ip212{
+    margin-top:-143px;
+    margin-left:175px;
+            
+}
+
+    .txt-32{
+    margin-top:155px;
+    margin-left:80px;
+    color:white;
+
+}
+
+    .txt-33{
+    width: 405px;
+    margin-top:-190px;
+    margin-left:-630px;
+    color:white;
+}
+
+.btn232{
+    margin-top:23px;
+    margin-left:-520px;
+}
+
+.btn231{
+    margin-top:23px;
+    margin-left:332px;
+    
+
+}
+
+.container2{
+    background-color:#212529;
+    display:flex;
+    height:400px;
+}
+
+.container3{
+    margin-left:-170px;
+}
+
+
+.text-light{
+    margin-left:-90px;
+    margin-top:10px;
+    font-size:revert-layer;
+}
+
+
+.topmargin-sm{
+    margin-left:-300px;
+    margin-top:30px;
+}
+
+.mt-5{
+    margin-top: 3rem !important;
+    margin-left:-28px;
+}
+
+}

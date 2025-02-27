@@ -1,0 +1,59 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+        <button class="toggle-menu" id="toggle-menu">
+            ☰
+        </button>
+        
+        <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+            <li><a href="{%url 'home'%}">Home</a></li>
+            <li><a href="{%url 'mapa'%}">Mapa</a></li>
+            <li><a href="{%url 'legenda'%}">Legenda</a></li>
+            <li><a href="{%url 'contato'%}">Contato</a></li>
+            <li><a href="{%url 'premium'%}">Planos Premium</a></li>
+            <li><a href="{%url 'minhaconta'%}">Minha Conta</a></li>
+        
+    </div>
+</nav>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+    
+    
+        <div class= "background"></div>
+        
+        <body><br>
+            <div class="sucesso" style="margin-left: 330px;max-width: 250px;">
+                <h1 class="sucesso" style=" margin-left: center;color: black; font-size: 100px;font-weight: bold;"> Sucesso!</h1>
+
+                <br>
+                <div class="alert alert-success" role="alert">
+                    A sua sugestão foi cadastrada!
+                  </div>
+            
+                  
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/sugestao">Voltar para Sugestão</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Sucesso!</li>
+                </ol>
+              </nav>
+
+            </div>      
+
+
+
+          
+        </body>
+
+{% endblock %}

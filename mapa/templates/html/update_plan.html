@@ -1,0 +1,401 @@
+{% load static %}
+
+{% block content %}
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+
+
+<script>
+    // Função para obter a localização do usuário
+    function obterLocalizacao() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                console.log('Latitude:', latitude);
+                console.log('Longitude:', longitude);
+
+                // Enviar os dados da localização para o backend Django
+                fetch('/bairro/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude
+                    })
+                })
+                .then(response => {
+                    return response.json();  // Transformar a resposta em JSON
+                })
+                .then(data => {
+                    // Exibir os dados recebidos para depuração
+                    console.log('Dados recebidos:', data);
+
+                    // Atualizar o nome do local nos três dashboards
+                    const nomeLocal = data.endereco ? data.endereco : 'Nome do Local Não Disponível';
+                    const bairroLocal = data.bairro ? data.bairro : 'Bairro Não Disponível';
+
+                    // Exibição simplificada para "Nome do Local" - pode ser "Cidade" ou "Rua e Número"
+                    if (data.cidade) {
+                        const nomeCidade = data.cidade;
+                        document.querySelectorAll('.nome-local').forEach(function(element) {
+                            element.innerText = nomeCidade;
+                        });
+                    } else if (data.endereco_abreviado) {
+                        const enderecoAbreviado = data.endereco_abreviado;
+                        document.querySelectorAll('.nome-local').forEach(function(element) {
+                            element.innerText = enderecoAbreviado;
+                        });
+                    } else {
+                        document.querySelectorAll('.nome-local').forEach(function(element) {
+                            element.innerText = nomeLocal;
+                        });
+                    }
+
+                    // Atualizar o bairro nos três dashboards
+                    document.querySelectorAll('.bairro-local').forEach(function(element) {
+                        element.innerText = bairroLocal;
+                    });
+                    
+                    // Atualizar os dados de clima
+                    document.querySelector('.clima-temperatura').innerText = data.clima.temperatura;
+                    document.querySelector('.clima-sensacao').innerText = data.clima.sensacao;
+                    document.querySelector('.clima-chuva').innerText = data.clima.chuva;
+                })
+                .catch(error => {
+                    console.error('Erro ao obter os dados de clima:', error);
+                });
+            });
+        } else {
+            alert('Geolocalização não suportada neste navegador.');
+        }
+    }
+
+    // Chamar a função assim que a página carregar
+    window.onload = obterLocalizacao;
+</script>
+
+
+
+
+
+<!-- Container do Mapa -->
+<div id="map" class="w-full h-screen"></div>
+
+<!-- Dashboard Inferior -->
+<div id="dashboard" class="dashboardmap absolute bottom-0 left-0 right-0 p-4">
+    <div class="bg-gray-900 shadow-lg p-4 text-white rounded-2xl flex flex-col space-y-4" style="height: 290px; width:100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: -10px;">
+            <div id="expand-btn" class="expand flex justify-center items-center flex-grow cursor-pointer">
+                <i class="fa-solid fa-caret-up text-white-500 text-2xl"></i>
+            </div>
+            <div id="close-btn" class="cursor-pointer">
+                <i class="fas fa-xmark text-red-500 text-2xl"></i>
+            </div>
+        </div>
+
+        <!-- Cabeçalho: Nome do Local e Bairro -->
+        <div class="flex justify-between items-center">
+            <div>
+                <!-- Elementos com IDs dinâmicos -->
+                <h1 id="nome-local" class="nome-local text-lg font-bold">NOME DO LOCAL</h1>
+                <h2 id="bairro-local" class="bairro-local text-sm text-gray-400">BAIRRO DO LOCAL</h2>
+            </div>
+        </div>
+
+
+
+        
+        <div class="grid grid-cols-5 gap-2 text-xs text-center">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-cloud text-gray-300 text-lg"></i> <!-- Ícone neutro da mínima -->
+                <span class="clima-temperatura">Min: {{ clima.temperatura_minima }}°C</span> <!-- Temperatura mínima -->
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <i class="fas {{ icone_maxima }} text-lg"></i> <!-- Ícone colorido da máxima -->
+                <span class="clima-condicao">Máx: {{ clima.temperatura_maxima }}°C</span> <!-- Temperatura máxima -->
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <i class="fas fa-thermometer-half text-red-400 text-lg"></i>
+                <span class="clima-sensacao">{{ sensacao }}°C</span> <!-- Sensação térmica -->
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <i class="fas fa-cloud-rain text-blue-400 text-lg"></i>
+                <span class="clima-chuva">{{ probabilidade_chuva|floatformat:2 }}%</span> <!-- Probabilidade de chuva com 2 casas decimais -->
+
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <i class="fas fa-tint text-blue-200 text-lg"></i>
+                <span class="clima-precipitacao">{{ chuva }}</span> <!-- Precipitação -->
+            </div>
+        </div>
+        
+        
+        
+
+
+
+
+        <!-- Informações de Trânsito -->
+        <div class="flex justify-between items-center text-sm p-2 bg-gray-800 rounded-lg">
+            <span class="font-semibold">Trânsito:</span>
+            <span>Tempo Estimado: 1h 50min</span>
+            <span>Distância Estimada: 150 KM</span>
+            <div class="flex items-center space-x-1">
+                <span>Qualidade do Trânsito:</span>
+                <span>Rápido</span>
+                <div class="h-3 w-3 rounded-full bg-green-500"></div>
+            </div>
+        </div>
+
+        <!-- Botões de Opções -->
+        <div class="grid grid-cols-4 gap-2">
+            <button class="bg-blue-600 text-white px-3 py-2 rounded-lg">Trânsito</button>
+            <button class="bg-gray-700 px-3 py-2 rounded-lg">Notícias</button>
+            <button class="bg-gray-700 px-3 py-2 rounded-lg">Alertas</button>
+            <button class="bg-gray-700 px-3 py-2 rounded-lg">Clima</button>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Oculto Quando Fechado -->
+<div id="dashboard-nofull" class="hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-6 rounded-t-2xl shadow-lg">
+    <h1 class="text-2xl font-bold">Dashboard Minimizado</h1>
+
+    <!-- Cabeçalho: Nome do Local e Bairro -->
+    <div class="flex justify-between items-center">
+        <div>
+            <!-- Elementos com IDs dinâmicos -->
+            <h1 id="nome-local" class="nome-local text-lg font-bold">NOME DO LOCAL</h1>
+            <h2 id="bairro-local" class="bairro-local text-sm text-gray-400">BAIRRO DO LOCAL</h2>
+        </div>
+    </div>
+
+   <!-- Clima e Sensação Térmica -->
+<div class="grid grid-cols-5 gap-2 text-xs text-center">
+    <div class="flex flex-col items-center">
+        <i class="fas fa-sun text-yellow-400 text-lg"></i>
+        <span class="clima-temperatura">28°C Sol</span> <!-- Atualiza com a temperatura -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-cloud text-gray-300 text-lg"></i>
+        <span class="clima-condicao">30°C Nublado</span> <!-- Atualiza com a condição -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-thermometer-half text-red-400 text-lg"></i>
+        <span class="clima-sensacao">32°C Sensação</span> <!-- Atualiza com a sensação térmica -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-cloud-rain text-blue-400 text-lg"></i>
+        <span class="clima-chuva">90% Chuva</span> <!-- Atualiza com a chance de chuva -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-tint text-blue-200 text-lg"></i>
+        <span class="clima-precipitacao">5mm</span> <!-- Atualiza com a precipitação -->
+    </div>
+</div>
+
+
+
+
+    <button id="open-dashboard" class="mt-4 bg-blue-600 px-4 py-2 rounded-lg">Abrir</button>
+</div>
+
+<!-- Dashboard Expandido -->
+<div id="dashboard-full" class="hidden fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-6 rounded-t-2xl shadow-lg" style="height: 470px;">
+    <h1 class="text-2xl font-bold">Dashboard Expandido</h1>
+    
+    <!-- Botão de Fechar da Dashboard Expandida -->
+    <div id="close-full" class="cursor-pointer absolute top-4 right-4">
+        <i class="fas fa-xmark text-red-500 text-2xl"></i>
+    </div>
+
+<!-- Cabeçalho: Nome do Local e Bairro -->
+<div class="flex justify-between items-center">
+    <div>
+        <!-- Elementos com IDs dinâmicos -->
+        <h1 id="nome-local" class="nome-local text-lg font-bold">NOME DO LOCAL</h1>
+        <h2 id="bairro-local" class="bairro-local text-sm text-gray-400">BAIRRO DO LOCAL</h2>
+    </div>
+</div>
+
+    <!-- Clima e Sensação Térmica -->
+<div class="grid grid-cols-5 gap-2 text-xs text-center">
+    <div class="flex flex-col items-center">
+        <i class="fas fa-sun text-yellow-400 text-lg"></i>
+        <span class="clima-temperatura">28°C Sol</span> <!-- Atualiza com a temperatura -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-cloud text-gray-300 text-lg"></i>
+        <span class="clima-condicao">30°C Nublado</span> <!-- Atualiza com a condição -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-thermometer-half text-red-400 text-lg"></i>
+        <span class="clima-sensacao">32°C Sensação</span> <!-- Atualiza com a sensação térmica -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-cloud-rain text-blue-400 text-lg"></i>
+        <span class="clima-chuva">90% Chuva</span> <!-- Atualiza com a chance de chuva -->
+    </div>
+    <div class="flex flex-col items-center">
+        <i class="fas fa-tint text-blue-200 text-lg"></i>
+        <span class="clima-precipitacao">5mm</span> <!-- Atualiza com a precipitação -->
+    </div>
+</div>
+
+    <!-- Informações de Trânsito -->
+    <div class="flex justify-between items-center text-sm p-2 bg-gray-800 rounded-lg" style="margin-top:20px;">
+        <span class="font-semibold">Trânsito:</span>
+        <span>Tempo Estimado: 1h 50min</span>
+        <span>Distância Estimada: 150 KM</span>
+        <div class="flex items-center space-x-1">
+            <div class="h-3 w-3 rounded-full bg-green-500"></div>
+            <span>Rápido</span>
+        </div>
+    </div>
+
+    <!-- Botões de Opções -->
+    <div class="grid grid-cols-4 gap-2" style="margin-top: 20px;">
+        <button class="bg-blue-600 text-white px-3 py-2 rounded-lg">Trânsito</button>
+        <button class="bg-gray-700 px-3 py-2 rounded-lg">Notícias</button>
+        <button class="bg-gray-700 px-3 py-2 rounded-lg">Alertas</button>
+        <button class="bg-gray-700 px-3 py-2 rounded-lg">Clima</button>
+    </div>
+
+
+
+    <!--Fotos do local: -->
+    <div class ="fotocapa">
+        <h1 class="text-2xl font-bold">Conhecer:</h1>
+    
+        <div class="capa" style="height: 162px; */;margin-top: 5px;border-radius: 14px;width: 320px;">
+        <a href="{%url 'home'%}" class="capa"> <img src="/static/EXEMPLO01.jpg" style="max-height: 162px; margin-top:5px; border-radius:14px; max-width: 320px; width: 300px; height: 162px;"></a>
+
+        <a href="{%url 'home'%}" i class="fa-solid fa-circle-chevron-right" style="margin-top: -90px;margin-left: 307px;"></i></a>
+            
+        </div>
+
+    </div>
+
+    <div class="container">
+    <div class="Musica" style="margin-left: 350px;margin-top: -160px;">
+
+    <div class="Msc2">
+        <div class="deezer">
+        <a href="{%url 'home'%}" class="capa"> <img src="/static/deezer.png" style="height:70px; width:70px; margin-left:20px;"></a>
+        </div>
+
+
+        <div class="spotify">
+            <a href="{%url 'home'%}" class="capa"> <img src="/static/spotify.png" style="height:70px;width:70px;margin-left: 100px;margin-top: -70px;"></a>
+        </div>
+
+
+        <div class="ytmusic">
+            <a href="{%url 'home'%}" class="capa"> <img src="/static/ytmusic.png" style="height: 40px;width:140px;margin-left: 175px;margin-top: -54px;"></a>
+        </div>
+
+    </div>
+
+    </div>
+
+
+    <!-- Consumo Estimado -->
+    <div class="flex flex-col items-center" style="margin-left: -130px;margin-top: 40px;">
+        <span class="font-semibold text-sm">Consumo até o destino:</span>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-gas-pump text-yellow-500"></i>
+            <span class="text-lg font-bold">5 Litros</span>
+        </div>
+    </div>
+
+
+     <!-- Estágio da Viagem -->
+     <div class="flex flex-col items-center" style="margin-left: 250px;margin-top: -47px;">
+        <span class="font-semibold text-sm" >Estágio da cidade:</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-1-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M9.283 4.002H7.971L6.072 5.385v1.271l1.834-1.318h.065V12h1.312z"></svg>
+    </div>
+
+    <div class="localiza" style="margin-top: -134px;margin-left: 712px;">
+        <button class="btn btn-success">
+            <i class="fas fa-share-alt"></i> Compartilhar Localização
+        </button>
+    </div>
+
+    <div class="tiro" style="margin-top: 5px;margin-left: 713px;">
+        <h1 class="text-2xl font-bold">Locais para evitar:</h1>
+        
+        <ul>
+            {% if locais_com_tiroteio_ordenados %}
+            <p>{{ locais_com_tiroteio_ordenados }}</p>  <!-- Verifique os dados diretamente no template -->
+
+                {% for local in locais_com_tiroteio_ordenados %}
+                    <li>{{ local }}</li>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum local para evitar encontrado.</p>
+            {% endif %}
+        </ul>
+        
+        
+</div>
+
+
+</div>
+</div>
+
+
+
+   
+</div>
+
+<!-- Script jQuery Corrigido -->
+<script>
+    $(document).ready(function() {
+        // Fechar dashboard padrão e mostrar "nofull"
+        $("#close-btn").click(function() {
+            $("#dashboard").fadeOut();
+            $("#dashboard-nofull").fadeIn();
+        });
+    
+        // Reabrir o dashboard padrão
+        $("#open-dashboard").click(function() {
+            $("#dashboard-nofull").fadeOut();
+            $("#dashboard").fadeIn();
+        });
+    
+        // Expandir dashboard
+        $("#expand-btn").click(function() {
+            $("#dashboard").fadeOut();
+            $("#dashboard-full").fadeIn();
+        });
+    
+        // Fechar dashboard expandido e voltar para o "nofull"
+        $("#close-full").click(function() {
+            $("#dashboard-full").fadeOut();
+            $("#dashboard").fadeIn();
+        });
+    });
+    
+</script>
+
+
+{% endblock %}

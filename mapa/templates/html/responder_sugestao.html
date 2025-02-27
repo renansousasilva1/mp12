@@ -1,0 +1,115 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <a href="{% url 'home' %}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+        <button class="toggle-menu" id="toggle-menu">
+            ☰
+        </button>
+        
+        <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'mapa' %}">Mapa</a></li>
+            <li><a href="{% url 'legenda' %}">Legenda</a></li>
+            <li><a href="{% url 'contato' %}">Contato</a></li>
+            <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+            <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+        </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+
+<div class="container">
+    <h2>Lista de Sugestões</h2>
+    <!-- Opções de filtro -->
+    <div class="d-flex justify-content-between mb-3">
+        <div>
+            <label for="filtro">Filtrar por:</label>
+            <select id="filtro" class="form-select" aria-label="Filtrar Sugestões">
+                <option value="todos">Todos</option>
+                <option value="recentes">Enviados Mais Recentes</option>
+                <option value="anteriores">Enviados Anteriormente</option>
+                <option value="planos">Filtrar por Planos de Usuário</option>
+                <!-- Adicione opções adicionais de plano conforme necessário -->
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Autor</th>
+                <th>Plano</th>
+                <th>Título</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sugestao in sugestoes %}
+                <tr data-data-envio="{{ sugestao.data_envio|date:'Y-m-d' }}">
+                    <td>{{ sugestao.autor.username }}</td>
+                    <td>{{ sugestao.autor.profile.plan }}</td>
+                    <td>{{ sugestao.titulo }}</td>
+                    <td>
+                        <a href="{% url 'responder_sugestao' sugestao.id %}" class="btn btn-primary">Responder</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Nenhuma sugestão disponível para responder no momento. Volte mais tarde!</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('filtro').addEventListener('change', function() {
+        const valorFiltro = this.value;
+        const tbody = document.querySelector('tbody');
+        const trSugestoes = Array.from(tbody.querySelectorAll('tr[data-data-envio]'));
+
+        // Função auxiliar para obter a data da sugestão
+        function getData(tr) {
+            return new Date(tr.dataset.dataEnvio); // Corrigido para acessar o atributo corretamente
+        }
+
+        // Limpa a exibição antes de aplicar o filtro
+        trSugestoes.forEach(tr => tr.style.display = '');
+
+        // Filtragem e ordenação
+        if (valorFiltro === 'recentes') {
+            trSugestoes.sort((a, b) => getData(b) - getData(a)); // Ordena do mais recente para o mais antigo
+        } else if (valorFiltro === 'anteriores') {
+            trSugestoes.sort((a, b) => getData(a) - getData(b)); // Ordena do mais antigo para o mais recente
+        } else if (valorFiltro === 'planos') {
+            const planoSelecionado = prompt("Digite o plano que deseja filtrar:").toLowerCase(); // Converte para minúsculas
+            trSugestoes.forEach(tr => {
+                const plano = tr.children[1].innerText.toLowerCase(); // Supondo que o plano está na segunda coluna
+                if (plano !== planoSelecionado) {
+                    tr.style.display = 'none'; // Esconde se não corresponder
+                } else {
+                    tr.style.display = ''; // Exibe se corresponder
+                }
+            });
+        }
+
+        // Atualizar a ordem no DOM
+        tbody.innerHTML = ""; // Limpa o tbody
+        trSugestoes.forEach(tr => tbody.appendChild(tr)); // Adiciona os elementos ordenados de volta
+    });
+</script>
+
+{% endblock %}

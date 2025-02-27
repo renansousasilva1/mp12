@@ -1,0 +1,119 @@
+body {
+     width: 100%;
+     height: auto;  
+     color: transparent;
+     font-family:Verdana, Geneva, Tahoma, sans-serif;
+     z-index:0;}
+
+.fa-map-marker-alt{
+    margin-block-end: auto;   
+    color: white;
+  }
+
+.fa-dot-circle {
+margin-block-end: auto;
+margin-top:10px;
+color: white; }
+
+
+.img{
+width: 10px;
+height: 10px;}
+
+p.alert-success, .fasfa-road {
+     border-radius: 10px;
+     width: auto;
+     height: auto;
+     padding-left: 7px;
+     padding-top: 7px;
+     position: absolute;
+     background-color: white;
+     z-index: 1;
+     margin-top: 110px;
+     margin-left: 30px;}
+
+
+ #map {
+     position: absolute;
+     width: 100%;
+     height: 90%;
+     padding-top: 0px;
+     margin-left: 0px;
+     margin-top: 0px;
+     z-index: 0;
+ }
+
+.col-xs-offset-2{
+     margin-top: 5px;
+     margin-left: 4px;
+     z-index: 1;}
+     
+.gm-style .gm-style-iw-c {
+position: absolute;
+box-sizing: border-box;
+color: black;
+overflow: hidden;
+top: 0;
+left: 0;
+transform: translate3d(-50%,-100%,0);
+background-color: white;
+border-radius: 8px;
+padding: 12px;
+box-shadow: 0 2px 7px 1px rgb(0 0 0 / 30%);}
+
+
+form.form-horizontal{
+z-index: 1;
+margin-left: 30px;}
+
+
+.col-xs-2, .col-xs-4 {
+     margin-left: -20px;
+     margin-top: 10px;
+     width: auto;
+     z-index: 1;}
+
+label.col-xs-2.control-label, .col-xs-10 {
+     margin-left: 10px;
+     position: absolute;
+     display: block;
+     margin-top: -11px;}
+
+.btn-group-lg > .btn, .btn-lg {
+     position: relative;
+     top: 110px;
+     display: flex;
+     margin-left: 0vh;
+     align-items: flex-end;
+     padding-left: 10px;
+     padding-top: 10px;
+     font-size: 15px;
+     line-height: 1.33333;
+     border-radius: 6px;
+     }
+
+#output {
+     background-color: black;
+     margin-top: 35px;
+     margin-left: -20px;
+     z-index: 1;
+     }
+
+.container-fluid1{
+     position: absolute;
+     z-index: 1;
+}
+
+#destionation.form-control.pac-target-input{
+     z-index: 1;
+}
+
+.gm-style-mtc {
+     /* background-color: red; */
+     margin: 0px;
+     z-index: 0;
+     
+     position: fixed;
+     cursor: pointer;
+     top: 75vh;}
+

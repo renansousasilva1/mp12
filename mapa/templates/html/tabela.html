@@ -1,0 +1,25 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+<h2>BAIRROS COM TIROTEIO</h2>
+</div>
+
+<div class="container">
+{% if locais_com_tiroteio %}
+    <ul>
+        {% for local in locais_com_tiroteio %}
+            <li>{{ local }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="container">
+{% else %}
+    <p>Nenhum tiroteio registrado nas últimas 24 horas.</p>
+{% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Informações</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> <!-- Se você tiver um arquivo CSS externo -->
+</head>
+<body>
+<nav class="navbar">
+    <div class="container">
+        <a href="{% url 'home' %}" class="brand">
+            <img src="{% static 'logo.png' %}" style="width:40px; height:auto;">
+        </a>
+        <button class="toggle-menu" id="toggle-menu">☰</button>
+        <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'mapa' %}">Mapa</a></li>
+            <li><a href="{% url 'legenda' %}">Legenda</a></li>
+            <li><a href="{% url 'contato' %}">Contato</a></li>
+            <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+            <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+        </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+
+<script>
+    function obterLocalizacao() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                // Captura a latitude e longitude
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+    
+                // Passa as coordenadas para o Django via AJAX
+                obterDadosClimaticos(latitude, longitude);
+            }, function(error) {
+                alert("Não foi possível obter sua localização.");
+            });
+        } else {
+            alert("Geolocalização não é suportada neste navegador.");
+        }
+    }
+    
+    function obterDadosClimaticos(latitude, longitude) {
+        // Fazendo a requisição AJAX para a API do clima
+        fetch(`/clima/?latitude=${latitude}&longitude=${longitude}`)
+            .then(response => response.json())
+            .then(data => {
+                // Exibe os dados climáticos no painel
+                document.getElementById("cidade").innerText = data.cidade;
+                document.getElementById("sensacao").innerText = data.sensacao;
+                document.getElementById("temperatura_minima").innerText = data.temperatura_minima;
+                document.getElementById("temperatura_maxima").innerText = data.temperatura_maxima;
+                document.getElementById("chuva").innerText = data.chuva;
+                document.getElementById("status").innerText = data.status;
+            })
+            .catch(error => console.error("Erro ao obter dados climáticos:", error));
+    }
+    
+</script>
+
+
+<h1>Painel de Informações</h1>
+
+<div class="box" style="margin-left:20px; background-color: #aeaeae; height:200px; width:320px; border-radius: 15px; opacity:100%; 
+background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcQ_wxZTp9MKp3ZFKbtiEdhTzJghnHD2lzJWvjB1nKMCMFx7ighwK1ZxWijOvAOKrwDEIHG7XjgCAq-sTLBQsLNsdollNSzOAIZHJYUPxw');
+background-size: cover; background-position: center; background-repeat: no-repeat;">
+    
+    <strong>
+    <h1 class="header-22" style="color:white; margin-left:11px; font-size:25px;">{{ clima.cidade }}</h1><br>
+    <p class="header-23" style="color:white; margin-top: -25px;margin-left: 11px;">🌡️ {{ sensacao }}</p>
+    <div class="container" style="margin-left:-10px; margin-top:-10px;">
+        <p class="header-24" style="color:white; margin-top:5px; margin-left:10px;">🌡️ Mínima: {{ clima.temperatura_minima }}</p>
+        <p class="header-25" style="color:white; margin-top:5px; margin-left:10px;">🔥 Máxima: {{ clima.temperatura_maxima }}</p>
+    </div>
+    <p class="header-25" style="color:white; margin-top:5px; margin-left:10px;">
+        🌧️ Chuva: {{ chuva }}</p>
+        
+    <p class="header-26" style="color:white; margin-top:5px; margin-left:10px;">STATUS: {{ status }}</p>
+</div>
+
+</body>
+</html>
+{% endblock %}

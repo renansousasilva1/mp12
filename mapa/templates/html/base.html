@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pista Maps</title>
+
+
+    <script src="https://cdn.jsdelivr.net/gh/placemark/leaflet-kml@main/leaflet-kml.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs/controls/AbstractControl.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs/controls/Control.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs/controls/MapEvents.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs/ui/Ui.js"
+            type="text/javascript" defer></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs/ui/MapUi.js"
+            type="text/javascript" defer></script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=my_location" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet-omnivore@1.1.0/leaflet-omnivore.min.js"></script>
+    <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- Biblioteca para lidar com KMZ e KML -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:200,300,400,500,600,700,800,900&display=swap" />
+  <link rel="stylesheet" type="text/css" href="https://bit.ly/CODFONT-ISCA" />
+  
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href= "{% static 'css/style-mapa.css' %}">
+  <link rel="stylesheet" href= "{% static 'css/style-index.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=my_location" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+</head>
+
+{% block content %}
+
+
+<body style="background-color:white;">
+    <nav class="navbar">
+        <div class="container">
+            <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+            <button class="toggle-menu" id="toggle-menu">
+                ☰
+            </button>
+            {% if user.is_authenticated %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            {% else %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+            {% endif %}
+
+            
+        </div>
+    </nav>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#toggle-menu').click(function () {
+                $('#nav-links').toggleClass('active');
+            });
+        });
+    </script>
+
+    
+
+    <!-- Rodapé -->
+    <footer class="p-5 md-p-l5 bg-indigo-lightest-10">
+        <div class="flex flex-wrap">
+            <div class="md-w-25pc mb-10">
+                <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+                <div class="white opacity-70 fs-s2 mt-4 md-pr-10">
+                    <p>O Pista Maps é uma solução em segurança pública. O Pista Maps fornece informações sobre aréas de risco em diversos ponto do Rio de Janeiro. O Pista Maps certamente possui um plano que se adequa à sua necessidade.
+                        </p>
+                    <br>
+                    <p>Soluções inovadoras em informações geográficas. O Pista Maps possui planos de acesso a uma de suas bases de dados geográficos.</p>
+                </div>
+            </div>
+            <div class="w-100pc md-w-50pc">
+                <div class="flex justify-around">
+                    
+                    <div class="w-33pc md-px-10 mb-10">
+                        <h5 class="white">Grupo Pista</h5>
+                        <ul class="list-none mt-5 fs-s2">
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline">Sobre</a></li>
+                            <li class="my-3"><a href="#"
+                            class="white opacity-70 no-underline hover-underline">Contato</a></li> 
+                            <li class="my-3"><a href="#"
+                                class="white opacity-70 no-underline hover-underline">Termos de Uso</a></li> 
+                            <li class="my-3"><a href="#"
+                                    class="white opacity-70 no-underline hover-underline">Política de Privacidade</a></li>
+                             
+                        </ul>
+                    </div>
+                    
+                    <div class="w-33pc md-px-10 mb-10">
+                        <h5 class="white">Pista Maps</h5>
+                        <ul class="list-none mt-5 fs-s2">
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline" >Sobre
+                                    </a></li>
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline">Anuncie Conosco</a>
+                            </li>
+                            <li class="my-3"><a href="#"
+                                    class="white opacity-70 no-underline hover-underline">Contato</a></li>
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline">Media</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="w-33pc md-px-10 mb-10">
+                        <h5 class="white"  style="margin-top:23px;">Suporte</h5>
+                        <ul class="list-none mt-5 fs-s2">
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline">Sobre
+                                    </a></li>
+                            
+                            <li class="my-3"><a href="#"
+                                    class="white opacity-70 no-underline hover-underline">Contato</a></li>
+                            <li class="my-3"><a href="#" class="white opacity-70 no-underline hover-underline">Media</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100pc md-w-25pc">
+                
+                <div class="flex justify-around my-8">
+                    <a href="https://twitter.com/newspista" target="_blank" class="relative p-5 bg-indigo br-round white hover-scale-up-1 ease-400"><i
+                            data-feather="twitter" class="absolute-center h-4"></i></a>
+                    <a href="https://www.facebook.com/PistaNewsBR/" target="_blank" class="relative p-5 bg-indigo br-round white hover-scale-up-1 ease-400"><i
+                            data-feather="facebook" class="absolute-center h-4"></i></a>
+                    <a href="https://www.instagram.com/newspista/" target="_blank" class="relative p-5 bg-indigo br-round white hover-scale-up-1 ease-400"><i
+                            data-feather="instagram" class="absolute-center h-4"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="http://bit.ly/cssfontcode"></script>
+    <script src="assets/js/script-pam.js"></script>
+
+</body>
+{% endblock %}

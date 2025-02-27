@@ -1,0 +1,432 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://unpkg.com/@mapbox/polyline@latest"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <!-- React e ReactDOM via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Seu script React -->
+    <script src="{% static '/js/DistanceTimeDisplay.js' %}"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa com Rotas Dinâmicas</title>
+    <style>
+
+        .locate-button {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            margin-top: -143px;
+            right: 10px;
+            z-index: 2;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            height: 33px;
+            width: 35px;
+            padding: 8px;
+            padding-left: 5px;
+            padding-top: 8.5px;
+            cursor: pointer;
+        }
+
+        .navbar{
+            z-index:40;
+        }
+
+       
+       
+        
+        /* Estilos para a box lateral */
+        .route-bar{
+            width:355px;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            width: 355px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-box {
+            background: white;
+            padding: 10px;
+            padding-left: 18px;
+            margin-left: -100px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            max-width: 390px;
+            width: 950px;
+            height: 1675px;
+            font-family: Arial, sans-serif;}
+
+
+        .route-item {
+            margin-bottom: 10px;
+        }
+        .route-item p {
+            margin: 0;
+        }
+        #input-container {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            max-width: 300px;
+        }
+        #input-container input {
+            margin: 5px 0;
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
+
+
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+            <button class="toggle-menu" id="toggle-menu">
+                ☰
+            </button>
+            <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                <li><a href="{%url 'home'%}">Home</a></li>
+                    <li><a href="{%url 'mapa'%}">Mapa</a></li>
+                    <li><a href="{%url 'legenda'%}">Legenda</a></li>
+                    <li><a href="{%url 'contato'%}">Contato</a></li>
+                    <li><a href="{%url 'premium'%}">Planos Premium</a></li>
+                    <li><a href="{%url 'minhaconta'%}">Minha Conta</a></li>
+            </ul>
+            
+        </div>
+    </nav>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#toggle-menu').click(function () {
+                $('#nav-links').toggleClass('active');
+            });
+        });
+    </script>
+    <script src="https://unpkg.com/leaflet-omnivore@latest/leaflet-omnivore.min.js">
+    </script>
+
+
+
+<body style="background:black;">
+    <div class="container-lg" style="z-index:5; position:absolute; max-width: 260px;">
+        <div class="search-container" style="margin-top: 20px; z-index:5; margin-left: 20px;">
+            <div class="mb-3" style="z-index:5; width: 290px;">
+                <input type="text" id="start-input" class="form-control" placeholder="Indo de:">
+            </div>
+            <div class="mb-3" style="z-index:5; width: 290px;">
+                <input type="text" id="end-input" class="form-control" placeholder="Para:">
+            </div>
+            <button id="search-button" class="btn btn-primary" style="z-index:5;">Buscar Rotas</button>
+        </div>
+    </div>
+
+    <div class="result-box" id="result-box" style="display:none;z-index: 5;width: 290px;">
+        <h4>Resultados</h4>
+        <p id="distance"></p>
+        <p id="duration"></p>
+    </div>
+        
+    <div id="map" style="z-index:0; height:435px;"></div>       
+    <div class="locate-button" onclick="locateUser()">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">my_location</span>
+    </div>
+    
+    <script>
+        // Inicializa o mapa
+        const map = L.map('map').setView([-23.000372, -43.365894], 10);
+        
+        // Adiciona o layer base
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors & CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Adiciona um círculo azul para a localização do usuário
+        var userMarker = L.circleMarker([0.0, -0.09], {
+            radius: 10,
+            fillColor: "#0f356b",
+            color: "#3388ff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.5
+        }).addTo(map);
+        
+        // Função para atualizar a localização do usuário
+        function updateLocation(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+        
+            // Atualiza a posição do marcador
+            userMarker.setLatLng([lat, lon]);
+            map.setView([lat, lon], 13); // Centraliza o mapa na nova posição
+        }
+        
+        // Função para lidar com erros de geolocalização
+        function handleError(error) {
+            console.warn(`ERRO (${error.code}): ${error.message}`);
+        }
+        
+        // Solicita a localização do usuário
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updateLocation, handleError, {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 10000
+            });
+        } else {
+            alert("Geolocalização não é suportada por este navegador.");
+        }
+    
+        // Função para redirecionar o mapa para a localização do usuário
+        function locateUser() {
+            var latLng = userMarker.getLatLng();
+            map.setView(latLng, 16); // Redefine o zoom e a localização
+        }
+            
+        map.zoomControl.setPosition('bottomright');
+
+        // Caminhos dos arquivos KMZ
+        const kmzUrls = [
+            '/static/app/5m.kmz',
+            '/static/app/ada.kmz',
+            '/static/app/tcp.kmz',
+            '/static/app/cv.kmz'
+        ];
+    
+            
+        // Função para carregar o KMZ e adicionar ao mapa
+        let locationsList = [];
+        function loadKmzLayer(kmzUrl, layerName) {
+            fetch(kmzUrl)
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    const zip = new JSZip();
+                    return zip.loadAsync(buffer);
+                })
+                .then(zip => {
+                    const kmlFile = Object.keys(zip.files).find(fileName => fileName.endsWith('.kml'));
+                    if (!kmlFile) throw new Error('Arquivo KML não encontrado no KMZ');
+                    return zip.files[kmlFile].async('text');
+                })
+                .then(kmlText => {
+                    const parser = new DOMParser();
+                    const kml = parser.parseFromString(kmlText, 'text/xml');
+                    const geojson = toGeoJSON.kml(kml);
+        
+                    const geoJsonLayer = L.geoJSON(geojson, {
+                        style: feature => ({
+                            color: feature.properties.stroke || 'blue',
+                            fillColor: feature.properties.fill || 'blue',
+                            fillOpacity: feature.properties['fill-opacity'] || 0.5,
+                            weight: feature.properties['stroke-width'] || 2
+                        }),
+                        pointToLayer: function (feature, latlng) {
+                            const icon = getDefaultIcon(layerName);
+                            return L.marker(latlng, { icon: icon });
+                        },
+                        onEachFeature: (feature, layer) => {
+                            const props = feature.properties || {};
+                            if (props.name || props.description) {
+                                layer.bindPopup(`<b>${props.name || 'Sem nome'}</b><br>${props.description || 'Sem descrição'}`);
+                            }
+                        }
+                    });
+        
+                    geoJsonLayer.addTo(map);
+                })
+                .catch(error => console.error('Erro ao processar o KMZ:', error));
+        }
+        
+        kmzUrls.forEach((url, index) => {
+            loadKmzLayer(url, `Camada ${index + 1}`);
+        });
+
+        function calculateRoute(start, end) {
+            const osrmBaseUrl = "https://router.project-osrm.org/route/v1/driving/";
+            const url = `${osrmBaseUrl}${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
+        
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.routes.length > 0) {
+                        const route = data.routes[0];
+                        const routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+        
+                        // Remover rota anterior, se existir
+                        if (window.currentPolyline && map.hasLayer(window.currentPolyline)) {
+                            map.removeLayer(window.currentPolyline);
+                        }
+        
+                        // Criar nova rota
+                        window.currentPolyline = L.polyline(routeCoordinates, {
+                            color: 'blue',
+                            weight: 5,
+                            opacity: 0.9
+                        }).addTo(map);
+        
+                        map.fitBounds(window.currentPolyline.getBounds());
+        
+                        // Criar marcadores personalizados
+                        createCustomMarker(start.lat, start.lng, "A", "red");
+                        createCustomMarker(end.lat, end.lng, "B", "green");
+        
+                        // Exibir distância e tempo estimado
+                        document.getElementById("distance").innerText = "Distância estimada: " + (route.distance / 1000).toFixed(1) + " km";
+                        document.getElementById("duration").innerText = "Tempo estimado: " + Math.round(route.duration / 60) + " minutos";
+                        document.getElementById("result-box").style.display = "block";
+                    } else {
+                        alert("Nenhuma rota encontrada.");
+                    }
+                })
+                .catch(error => console.error("Erro ao obter rota do OSRM:", error));
+        }
+        
+        
+        document.getElementById("search-button").addEventListener("click", () => {
+            const startInput = document.getElementById("start-input").value;
+            const endInput = document.getElementById("end-input").value;
+        
+            getCoordinates(startInput, startCoords => {
+                getCoordinates(endInput, endCoords => {
+                    calculateRoute(startCoords, endCoords);
+                });
+            });
+        });
+        
+        function getCoordinates(address, callback) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Dados recebidos do Nominatim:", data);
+                    if (data.length > 0) {
+                        // Pega o resultado mais relevante (com maior importância)
+                        const bestMatch = data.sort((a, b) => b.importance - a.importance)[0];
+                        callback({ lat: parseFloat(bestMatch.lat), lng: parseFloat(bestMatch.lon) });
+                    } else {
+                        alert("Endereço não encontrado: " + address);
+                    }
+                })
+                .catch(error => console.error("Erro ao buscar coordenadas:", error));
+        }
+        
+
+        function createCustomMarker(lat, lng, label, color) {
+            return L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background-color: ${color}; color: white; width: 24px; height: 24px; 
+                            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+                            font-weight: bold;">${label}</div>`,
+                    iconSize: [24, 24]
+                })
+            }).addTo(map);
+        }
+        
+    </script>
+
+    
+        <div id="route-results"></div>
+
+    
+
+        <style>
+            /* Estilização personalizada para o mapa e a caixa de resultados */
+            #map {
+                height: 435px;
+                width: 100%;
+                z-index: 0;
+            }
+    
+            #location-button {
+                position: relative;
+                bottom: 180px;
+                left: 1070px;
+                padding-top: 7px;
+                padding-left: 7px;
+                padding-right: 7px;
+                margin-top: 0px;
+                z-index: 1000;
+                border-radius: 5px;
+            }
+    
+            .search-container {
+                z-index: 1;
+                position: relative;
+                margin-bottom: 20px;
+            }
+    
+            .result-box {
+                background-color: white;
+                padding: 20px;
+                margin-top: 173px;
+                margin-left: 30px;
+                position: fixed;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+    
+            .custom-marker {
+                
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 12px;
+                color: white;
+                font-weight: bold;
+            }
+    
+            .start-marker {
+                background-color: red; /* Círculo vermelho para ponto de partida */
+                
+            }
+    
+            .end-marker {
+                background-color: green; /* Círculo verde para ponto de destino */
+                
+            }
+        </style>
+        <style>
+            .hidden {
+                display: none;
+            }
+            
+            #sidebar {
+                background-color: white;
+                padding: 10px;
+                border-radius: 5px;
+                width: 300px;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+            }
+            
+           
+            
+        </style>
+    
+
+</body>   
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+        <button class="toggle-menu" id="toggle-menu">
+            ☰
+        </button>
+        
+        <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+            <li><a href="{%url 'home'%}">Home</a></li>
+            <li><a href="{%url 'mapa'%}">Mapa</a></li>
+            <li><a href="{%url 'legenda'%}">Legenda</a></li>
+            <li><a href="{%url 'contato'%}">Contato</a></li>
+            <li><a href="{%url 'premium'%}">Planos Premium</a></li>
+            <li><a href="{%url 'minhaconta'%}">Minha Conta</a></li>
+        
+    </div>
+</nav>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+
+<form method="post">
+{% csrf_token %}
+    <div class="form-group">
+        {{ user_form.username.errors }}
+    <label>Usuário: </label>
+    {{user_form.username}}
+    <div>
+
+    <div class="form-group">
+        <!-- Campo de e-mail (usado como identificador público) -->
+        {{ user_form.email.errors }}
+    <label for="id_email">E-mail: </label>
+    {{ user_form.email }}
+    </div>
+        
+        
+
+    <div class="form-group">
+        {{ user_form.password1.errors }}
+        <label>Senha: </label>
+        {{user_form.password1}}
+    <div>
+    
+    <div class="form-group">
+        {{ user_form.password2.errors }}        
+        <label>Senha: </label>
+        {{user_form.password2}}
+    <div>
+
+        <div class="form-group">
+            <input type="submit" value="Cadastrar">
+        <div>
+
+
+
+<form>
+
+    
+
+    
+{% endblock %}

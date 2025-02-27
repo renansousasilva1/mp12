@@ -1,0 +1,166 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <a href="{% url 'home' %}" class="brand">
+            <img src="/static/logo.png" style="width:40px; height:auto;">
+        </a>
+        <button class="toggle-menu" id="toggle-menu">☰</button>
+
+        {% if user.is_authenticated %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            {% else %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+            {% endif %}
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+
+<style>
+    /* Seu estilo permanece o mesmo */
+</style>
+
+<body>
+<div class="container py-4">
+    <h1 class="text-center mb-4">Minha Conta</h1>
+
+    <!-- Linha 1: Card com informações do perfil -->
+    <div class="row">
+        <div class="col-12">
+            <div class="profile-card text-center">
+                {% if user.is_authenticated %}
+                <img src="{% if user.profile.photo %}{{ user.profile.photo.url }}{% else %}https://via.placeholder.com/100{% endif %}" alt="Foto de Perfil" class="rounded-circle img-fluid mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+
+                
+                    <h5>Olá, <span id="user-name">{{ user.username }}</span>!</h5>
+                    <p class="text-muted">Email: <span id="user-email">{{ user.email }}</span></p>
+                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="editProfile()">Editar Perfil</button>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha 2: Preferências -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="section-title text-center">Preferências</h5>
+            <div class="list-group mb-4">
+                <button class="list-group-item list-group-item-action" onclick="changePassword()">
+                    <i class="bi bi-key me-2"></i> Alterar Senha
+                </button>
+                <button class="list-group-item list-group-item-action" onclick="manageSubscriptions()">
+                    <i class="bi bi-bell me-2"></i> Gerenciar Assinaturas
+                </button>
+                <button class="list-group-item list-group-item-action" onclick="privacySettings()">
+                    <i class="bi bi-shield-lock me-2"></i> Configurações de Privacidade
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha 3: Logout -->
+    <div class="row">
+        <div class="col-12">
+            <div class="logout-container">
+                <button class="btn btn-danger mt-3" onclick="logout()">Sair da Conta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Funções de exemplo para interações
+    function editProfile() {
+        alert("Função para editar perfil ainda não implementada.");
+    }
+
+    function changePassword() {
+        alert("Função para alterar senha ainda não implementada.");
+    }
+
+    function manageSubscriptions() {
+        window.location.href = "{% url 'premium' %}";
+    }
+
+    function privacySettings() {
+        alert("Função para configurar privacidade ainda não implementada.");
+    }
+
+</script>
+
+
+    <script>
+        function logout() {
+            const confirmLogout = confirm("Você tem certeza que deseja sair?");
+            if (confirmLogout) {
+                // Faz uma requisição para a URL de logout
+                fetch("{% url 'logout' %}", {
+                    method: "POST", // Se sua view espera um POST, altere aqui
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken") // Adiciona o token CSRF se necessário
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "{% url 'home' %}"; // Redireciona após logout
+                    } else {
+                        alert("Erro ao tentar sair da conta.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                    alert("Erro ao tentar sair da conta.");
+                });
+            }
+        }
+    
+        // Função para obter o cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Verifica se este cookie começa com o nome desejado
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    
+
+
+
+</body>
+{% endblock %}

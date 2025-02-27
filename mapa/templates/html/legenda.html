@@ -1,0 +1,172 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<body style="background-color:white;">
+    <nav class="navbar">
+        <div class="container">
+            <a href="{%url 'home'%}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+            <button class="toggle-menu" id="toggle-menu">
+                ☰
+            </button>
+            {% if user.is_authenticated %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            {% else %}
+                <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'mapa' %}">Mapa</a></li>
+                    <li><a href="{% url 'legenda' %}">Legenda</a></li>
+                    <li><a href="{% url 'contato' %}">Contato</a></li>
+                    <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+            {% endif %}
+            
+        </div>
+    </nav>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#toggle-menu').click(function () {
+                $('#nav-links').toggleClass('active');
+            });
+        });
+    </script>
+
+    <body class="bg-black muli">
+    
+        <!-- hero section -->
+        <div class="bg" style="height:570px;">
+            <div style="background-image: url('https://pbs.twimg.com/media/Ggm6VrDXYAAbOXw?format=jpg&name=medium'); height:90%; width:100%; background-repeat: no-repeat; background-attachment: fixed; background-size: cover; opacity:80%;">
+    
+                <section id="home" class="min-h-100vh flex justify-start items-center">
+            
+            <div class="mx-5 md-mx-l5">
+               
+                <div>
+                    <h1 class="white fs-l3 lh-2 md-fs-xl1 md-lh-1 fw-900" style="opacity:100%; font:color">Entenda de forma<br/>simples</h1>
+                </div>
+            </div>
+                </section>
+            </div>
+        </div>
+
+
+<div class="container435">
+<h3 style="margin-top:-50px; margin-left:20px;color:white;">Cores do mapa</h3>
+
+
+<table class="table table-bordered border-dark-subtle" style="width:80%; border-color:green; margin-left:1px; margin-top:30px;">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">N°</th>
+        <th scope="col">SIGLA</th>
+        <th scope="col">COR</th>
+        <th scope="col">FACÇÃO</th>
+        <th scope="col">OBS:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">👆</th>
+        <td>ADA</td>
+        <td>Amarela</td>
+        <td>Amigo dos Amigos</td>
+        <td>Resistência 141</td>
+      </tr>
+      <tr>
+        <th scope="row">2</th>
+        <td>CV</td>
+        <td>Vermelha</td>
+        <td>Comando Vermelho</td>
+        <td></td>
+      </tr>
+      <tr>
+        <th scope="row">3</th>
+        <td>TCP</td>
+        <td>Verde</td>
+        <td>Terceiro Comando Puro</td>
+        <td></td>
+      </tr>
+      <tr>
+        <th scope="row">5</th>
+        <td>5M</td>
+        <td>Azul</td>
+        <td>Milícia</td>
+        <td>Vários Grupos</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+<div class="container436">
+  <h3 style="margin-top:100px; margin-left:50px;color:white;">Entenda cada API</h3>
+  
+  
+  <table class="table table-bordered border-dark-subtle" style="width:80%; border-color:green; margin-left:1px; margin-top:10px;">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">N°</th>
+          <th scope="col">NOME</th>
+          <th scope="col">R$ POR MIL</th>
+          <th scope="col"></th>
+          <th scope="col">OBS:</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">👆</th>
+          <td>ADA</td>
+          <td>Amarela</td>
+          <td>Amigo dos Amigos</td>
+          <td>Resistência 141</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>CV</td>
+          <td>Vermelha</td>
+          <td>Comando Vermelho</td>
+          <td></td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>TCP</td>
+          <td>Verde</td>
+          <td>Terceiro Comando Puro</td>
+          <td></td>
+        </tr>
+        <tr>
+          <th scope="row">5</th>
+          <td>5M</td>
+          <td>Azul</td>
+          <td>Milícia</td>
+          <td>Vários Grupos</td>
+        </tr>
+      </tbody>
+    </table>
+  
+  </div>
+
+<style>
+
+  
+
+
+</style>
+
+
+
+</body>
+
+{% endblock %}

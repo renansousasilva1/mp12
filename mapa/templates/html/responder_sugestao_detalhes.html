@@ -1,0 +1,68 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <a href="{% url 'home' %}" class="brand"> <img src="/static/logo.png" style="width:40px; height:auto;"></a>
+        <button class="toggle-menu" id="toggle-menu">
+            ☰
+        </button>
+        
+        <ul class="nav-links" id="nav-links" style="margin-block: auto;">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'mapa' %}">Mapa</a></li>
+            <li><a href="{% url 'legenda' %}">Legenda</a></li>
+            <li><a href="{% url 'contato' %}">Contato</a></li>
+            <li><a href="{% url 'premium' %}">Planos Premium</a></li>
+            <li><a href="{% url 'minhaconta' %}">Minha Conta</a></li>
+        </ul>
+    </div>
+</nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#toggle-menu').click(function () {
+            $('#nav-links').toggleClass('active');
+        });
+    });
+</script>
+<br>
+
+<div class="container">
+    <nav style="--bs-breadcrumb-divider: '';">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="..">Lista de Sugestões</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <span>&lt;</span> Responder Sugestão
+            </li>
+        </ol>
+    </nav>
+    
+
+</div>
+
+
+<div class="container">   
+<h2>Responder Sugestão</h2>
+</div>
+
+<div class="container33" style="margin-left:100px;">
+<p><strong>Autor:</strong> {{ sugestao.autor }}</p>
+<p><strong>Título:</strong> {{ sugestao.titulo }}</p>
+<p><strong>Descrição:</strong> {{ sugestao.descricao }}</p>
+</div>
+
+<div class="container33" style="margin-left:100px;">
+<form method="post">
+    {% csrf_token %}
+    <textarea name="resposta" rows="4" cols="50"></textarea>  <!-- Removido {{ sugestao.resposta }} -->
+    <br>
+    <button type="submit" class="btn btn-primary">Enviar Resposta</button>
+</form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'html/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Rio de Janeiro - GPS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Maps API -->
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
+    
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            overflow: hidden;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Container do Mapa -->
+    <div id="map"></div>
+    <div class="dashboard" style="background-color:transparent;">
+    
+    <!-- Dashboard Inferior -->
+    <div class="absolute bottom-0 left-0 right-0 bg-dark text-white shadow-lg p-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0" style="height: 250px;">
+        
+        <!-- Clima Local e Destino -->
+        <div class="flex flex-col md:flex-row items-center space-x-4">
+            <div class="flex flex-col items-center">
+                <span class="font-semibold text-sm"> Clima Atual</span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">28°C</span>
+                    <i class="fas fa-sun text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="font-semibold text-sm">Clima no Destino</span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">30°C</span>
+                    <i class="fas fa-cloud text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações de Trânsito -->
+        <div class="flex flex-col items-center">
+            <span class="font-semibold text-sm">Trânsito em Tempo Real:</span>
+            <div class="flex space-x-1">
+                <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                <div class="text-sm text-gray-300">Rápido</div>
+            </div>
+            <button id="toggleTraffic" class="btn btn-primary mt-2">Ativar Trânsito</button>
+        </div>
+
+        <!-- Consumo Estimado -->
+        <div class="flex flex-col items-center">
+            <span class="font-semibold text-sm">Consumo até o destino:</span>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-gas-pump text-yellow-500"></i>
+                <span class="text-lg font-bold">5 Litros</span>
+            </div>
+        </div>
+
+        <!-- Estágio da Viagem -->
+        <div class="flex flex-col items-center">
+            <span class="font-semibold text-sm">Estágio da cidade:</span>
+            <i id="icone-estagio" class="bi bi-1-circle-fill text-white text-2xl"></i>
+        </div>
+
+        <!-- Outras Ferramentas -->
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button class="btn btn-secondary">Notícias Locais</button>
+            <button class="btn btn-secondary">Alertas de Trânsito</button>
+            <button class="btn btn-secondary">Previsão do Tempo</button>
+        </div>
+
+        <!-- Botões Adicionais -->
+        <div class="flex flex-wrap gap-2 justify-center mt-3">
+            <button class="btn btn-success">
+                <i class="fas fa-share-alt"></i> Compartilhar Localização
+            </button>
+            <button class="btn btn-warning">
+                <i class="fas fa-bus"></i> Ativar Transporte
+            </button>
+            <button class="btn btn-info">
+                <i class="fas fa-music"></i> App de Música
+            </button>
+        </div>
+
+    </div>
+    </div>
+
+    <script>
+        let map, trafficLayer;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: -22.9068, lng: -43.1729 }, // Rio de Janeiro
+                zoom: 10,
+                mapTypeId: "terrain",
+                streetViewControl: true,
+            });
+
+            // Camada de Trânsito
+            trafficLayer = new google.maps.TrafficLayer();
+
+            // Botão para ativar/desativar trânsito
+            document.getElementById("toggleTraffic").addEventListener("click", function () {
+                if (trafficLayer.getMap()) {
+                    trafficLayer.setMap(null);
+                    this.textContent = "Ativar Trânsito";
+                } else {
+                    trafficLayer.setMap(map);
+                    this.textContent = "Desativar Trânsito";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
+
+{% endblock %}
